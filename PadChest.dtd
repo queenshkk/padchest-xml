@@ -1,0 +1,40 @@
+<!ELEMENT PadChest (Patient+)>
+<!ELEMENT Patient (Naissance, Sexe, Etude+)>
+<!ATTLIST Patient id ID #REQUIRED>
+
+<!ELEMENT Naissance (#PCDATA)>
+<!ELEMENT Sexe (#PCDATA)>
+
+<!ELEMENT Etude (Image+)>
+<!ATTLIST Etude id ID #REQUIRED
+                patientRef IDREF #REQUIRED>
+
+<!ELEMENT Image (
+        ImageDir,
+        Projection,
+        MethodProjection,
+        Pediatric,
+        ReportID,
+        Report,
+        MethodLabel,
+        Labels,
+        Localizations,
+        LabelsLocalizationsBySentence,
+        LabelCUIS,
+        LocalizationsCUIS
+        )>
+
+<!ATTLIST Image id ID #REQUIRED>
+
+<!ELEMENT ImageDir (#PCDATA)>
+<!ELEMENT Projection (#PCDATA)>
+<!ELEMENT MethodProjection (#PCDATA)>
+<!ELEMENT Pediatric (#PCDATA)>
+<!ELEMENT ReportID (#PCDATA)>
+<!ELEMENT Report (#PCDATA)>
+<!ELEMENT MethodLabel (#PCDATA)>
+<!ELEMENT Labels (#PCDATA)>
+<!ELEMENT Localizations (#PCDATA)>
+<!ELEMENT LabelsLocalizationsBySentence (#PCDATA)>
+<!ELEMENT LabelCUIS (#PCDATA)>
+<!ELEMENT LocalizationsCUIS (#PCDATA)>
