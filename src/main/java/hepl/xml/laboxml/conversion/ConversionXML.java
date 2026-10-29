@@ -1,10 +1,16 @@
-package hepl.xml.laboxml;
+package hepl.xml.laboxml.conversion;
+
+import hepl.xml.laboxml.csv.LectureCSV;
+import hepl.xml.laboxml.model.Etude;
+import hepl.xml.laboxml.model.Image;
+import hepl.xml.laboxml.model.Patient;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ConversionXML {
     public static void main(String[] args) {
@@ -12,6 +18,8 @@ public class ConversionXML {
         String fichierXML = "PadChest.xml";
 
         ArrayList<Patient> patients = new ArrayList<Patient>();
+        HashMap<String, Patient> patientsParId = new HashMap<>();
+        HashMap<String, Etude> etudesParId = new HashMap<>();
 
         try {
             BufferedReader br = new BufferedReader(new FileReader(fichierCSV));
@@ -19,13 +27,14 @@ public class ConversionXML {
             // Ignorer l'entête
             br.readLine();
 
+            System.out.println("Début de la lecture du CSV");
             String ligne;
             int compteur = 0;
 
-            while ((ligne = lireEnregistrement(br)) != null && compteur < 1000) {
+            while ((ligne = LectureCSV.lireEnregistrement(br)) != null) {
                 compteur++;
 
-                String[] champs = decouperLigne(ligne);
+                String[] champs = LectureCSV.decouperLigne(ligne);
 
                 String imageID = champs[1];
                 String imageDir = champs[2];
@@ -50,39 +59,32 @@ public class ConversionXML {
                 String localizationsCUIS = champs[35];
 
                 // Si la ligne n'a pas de PatientID, on passe à la suivante
-                if (patientID == null) {
+                if (patientID == null || patientID.isEmpty()) {
                     continue;
                 }
 
-                // Chercher le patient
-                Patient patient = null;
-                for (Patient p : patients) {
-                    if (p.getId().equals(patientID)) {
-                        patient = p;
-                    }
-                }
+                Patient patient = patientsParId.get(patientID);
 
-                // S'il n'existe pas, on le crée
                 if (patient == null) {
                     patient = new Patient(patientID, naissance, sexe);
+
                     patients.add(patient);
+                    patientsParId.put(patientID, patient);
                 }
 
-                if (studyID == null) {
+                if (studyID == null || studyID.isEmpty()) {
                     continue;
                 }
-                // Chercher l'étude
-                Etude etude = null;
-                for (Etude e : patient.getEtudes()) {
-                    if (e.getId().equals(studyID)) {
-                        etude = e;
-                    }
-                }
 
-                // Si elle n'existe pas, on la crée
+                String cleEtude = patientID + "_" + studyID;
+
+                Etude etude = etudesParId.get(cleEtude);
+
                 if (etude == null) {
                     etude = new Etude(studyID, patientID);
+
                     patient.ajouterEtude(etude);
+                    etudesParId.put(cleEtude, etude);
                 }
 
                 // Créer l'image
@@ -132,9 +134,9 @@ public class ConversionXML {
 
             // Parcourir les études
             for (Etude etude : patient.getEtudes()) {
-                bw.write("    <Etude id=\"E" + echapperXML(etude.getId())
+                bw.write("    <Etude id=\"E" + echapperXML(etude.getPatientRef())
+                        + "_" + echapperXML(etude.getId())
                         + "\" patientRef=\"P" + echapperXML(etude.getPatientRef()) + "\">");
-
                 bw.newLine();
 
                 // Parcourir les images
@@ -194,44 +196,12 @@ public class ConversionXML {
 
             bw.close();
 
+            System.out.println("Enregistrements CSV lus : " + compteur);
             System.out.println("Conversion terminée.");
         } catch (Exception e) {
             System.out.println("Erreur : " + e.getMessage());
         }
 
-    }
-    public static String[] decouperLigne(String ligne) {
-        String[] champs = new String[36];
-
-        String valeur = "";
-        int colonne = 0;
-        boolean guillemets = false;
-
-        for (int i = 0; i < ligne.length(); i++) {
-
-            char caractere = ligne.charAt(i);
-
-            if (caractere == '"') {
-                if (guillemets == false) {
-                    guillemets = true;
-                }
-                else {
-                    guillemets = false;
-                }
-            }
-            else if (caractere == ',' && guillemets == false) {
-                champs[colonne] = valeur;
-                colonne++;
-                valeur = "";
-            }
-            else {
-                valeur = valeur + caractere;
-            }
-        }
-
-        champs[colonne] = valeur;
-
-        return champs;
     }
 
     public static String echapperXML(String texte) {
@@ -247,39 +217,5 @@ public class ConversionXML {
         return texte;
     }
 
-    public static String lireEnregistrement(BufferedReader br) throws Exception {
-        String ligne = br.readLine();
 
-        if (ligne == null) {
-            return null;
-        }
-
-        int nombreGuillemets = 0;
-
-        // Compter les guillemets
-        for (int i = 0; i < ligne.length(); i++) {
-            if (ligne.charAt(i) == '"') {
-                nombreGuillemets++;
-            }
-        }
-
-        // Si le nombre est impair, l'enregistrement continue
-        while (nombreGuillemets % 2 != 0) {
-            String ligneSuivante = br.readLine();
-
-            if (ligneSuivante == null) {
-                break;
-            }
-
-            ligne = ligne + " " + ligneSuivante;
-
-            for (int i = 0; i < ligneSuivante.length(); i++) {
-                if (ligneSuivante.charAt(i) == '"') {
-                    nombreGuillemets++;
-                }
-            }
-        }
-
-        return ligne;
-    }
 }

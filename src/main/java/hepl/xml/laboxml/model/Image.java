@@ -1,4 +1,4 @@
-package hepl.xml.laboxml;
+package hepl.xml.laboxml.model;
 
 public class Image {
     private String id;
