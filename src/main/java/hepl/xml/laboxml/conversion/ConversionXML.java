@@ -14,7 +14,7 @@ import java.util.HashMap;
 
 public class ConversionXML {
     public static void main(String[] args) {
-        String fichierCSV = "C:/Users/User/Documents/HEPL informatique/BAC 3/Q1/XML et BD avancées/Labo/PADCHEST_chest_x_ray_images_labels_160K_01.02.19.csv";
+        String fichierCSV = "PADCHEST_chest_x_ray_images_labels_160K_01.02.19.csv";
         String fichierXML = "PadChest.xml";
 
         ArrayList<Patient> patients = new ArrayList<Patient>();
