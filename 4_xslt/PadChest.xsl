@@ -11,12 +11,54 @@
             <head>
                 <meta charset="UTF-8"/>
                 <title>PadChest - Radiographies</title>
+
+                <style>
+                    body {
+                    font-family: Arial, sans-serif;
+                    background-color: #f4f6f9;
+                    margin: 30px;
+                    color: #333;
+                    }
+
+                    h1 {
+                    text-align: center;
+                    color: #23466b;
+                    }
+
+                    table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    background-color: white;
+                    }
+
+                    th {
+                    background-color: #23466b;
+                    color: white;
+                    padding: 12px;
+                    text-align: left;
+                    position: sticky;
+                    top: 0;
+                    }
+
+                    td {
+                    padding: 10px;
+                    border-bottom: 1px solid #ddd;
+                    }
+
+                    tr:nth-child(even) {
+                    background-color: #f2f5f8;
+                    }
+
+                    tr:hover {
+                    background-color: #e1ecf7;
+                    }
+                </style>
             </head>
 
             <body>
                 <h1>Liste des radiographies</h1>
 
-                <table border="1">
+                <table>
                     <tr>
                         <th>Patient</th>
                         <th>Naissance</th>

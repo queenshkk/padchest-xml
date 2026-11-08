@@ -24,7 +24,6 @@ public class ConversionXML {
         try {
             BufferedReader br = new BufferedReader(new FileReader(fichierCSV));
 
-            // Ignorer l'entête
             br.readLine();
 
             System.out.println("Début de la lecture du CSV");
@@ -58,7 +57,6 @@ public class ConversionXML {
                 String labelCUIS = champs[34];
                 String localizationsCUIS = champs[35];
 
-                // Si la ligne n'a pas de PatientID, on passe à la suivante
                 if (patientID == null || patientID.isEmpty()) {
                     continue;
                 }
@@ -87,7 +85,6 @@ public class ConversionXML {
                     etudesParId.put(cleEtude, etude);
                 }
 
-                // Créer l'image
                 Image image = new Image(
                         imageID,
                         imageDir,
@@ -109,7 +106,6 @@ public class ConversionXML {
 
         br.close();
 
-        // Création du fichier XML
         BufferedWriter bw = new BufferedWriter(new FileWriter(fichierXML));
 
         bw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
@@ -121,7 +117,6 @@ public class ConversionXML {
         bw.write("<PadChest>");
         bw.newLine();
 
-        // Parcourir les patients
         for (Patient patient : patients) {
             bw.write("  <Patient id=\"P" + echapperXML(patient.getId()) + "\">");
             bw.newLine();
@@ -132,14 +127,12 @@ public class ConversionXML {
             bw.write("    <Sexe>" + echapperXML(patient.getSexe()) + "</Sexe>");
             bw.newLine();
 
-            // Parcourir les études
             for (Etude etude : patient.getEtudes()) {
                 bw.write("    <Etude id=\"E" + echapperXML(etude.getPatientRef())
                         + "_" + echapperXML(etude.getId())
                         + "\" patientRef=\"P" + echapperXML(etude.getPatientRef()) + "\">");
                 bw.newLine();
 
-                // Parcourir les images
                 for (Image image : etude.getImages()) {
                     bw.write("      <Image id=\"I" + echapperXML(image.getId()) + "\">");
                     bw.newLine();
@@ -216,6 +209,4 @@ public class ConversionXML {
 
         return texte;
     }
-
-
 }
