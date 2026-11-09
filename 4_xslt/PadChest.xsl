@@ -52,6 +52,22 @@
                     tr:hover {
                     background-color: #e1ecf7;
                     }
+
+                    details {
+                    min-width: 180px;
+                    }
+
+                    summary {
+                    cursor: pointer;
+                    color: #23466b;
+                    font-weight: bold;
+                    }
+
+                    details p {
+                    margin: 8px 0;
+                    line-height: 1.5;
+                    overflow-wrap: anywhere;
+                    }
                 </style>
             </head>
 
@@ -66,6 +82,7 @@
                         <th>Image</th>
                         <th>Projection</th>
                         <th>Labels</th>
+                        <th>Détails</th>
                     </tr>
 
                     <xsl:for-each select="//Image">
@@ -93,6 +110,59 @@
                             <td>
                                 <xsl:value-of select="Labels"/>
                             </td>
+
+
+                            <td>
+                                <details>
+                                    <summary>Voir les détails</summary>
+
+                                    <p><strong>Étude :</strong>
+                                        <xsl:value-of select="../@id"/>
+                                    </p>
+
+                                    <p><strong>Répertoire image :</strong>
+                                        <xsl:value-of select="ImageDir"/>
+                                    </p>
+
+                                    <p><strong>Méthode de projection :</strong>
+                                        <xsl:value-of select="MethodProjection"/>
+                                    </p>
+
+                                    <p><strong>Pediatric :</strong>
+                                        <xsl:value-of select="Pediatric"/>
+                                    </p>
+
+                                    <p><strong>Méthode de labellisation :</strong>
+                                        <xsl:value-of select="MethodLabel"/>
+                                    </p>
+
+                                    <p><strong>Localisations :</strong>
+                                        <xsl:value-of select="Localizations"/>
+                                    </p>
+
+                                    <p><strong>Labels par phrase :</strong>
+                                        <xsl:value-of select="LabelsLocalizationsBySentence"/>
+                                    </p>
+
+                                    <p><strong>Label CUIS :</strong>
+                                        <xsl:value-of select="LabelCUIS"/>
+                                    </p>
+
+                                    <p><strong>Localisations CUIS :</strong>
+                                        <xsl:value-of select="LocalizationsCUIS"/>
+                                    </p>
+
+                                    <p><strong>Identifiant du rapport :</strong>
+                                        <xsl:value-of select="@rapportRef"/>
+                                    </p>
+
+                                    <p><strong>Rapport médical :</strong>
+                                        <xsl:variable name="refRapport" select="@rapportRef"/>
+                                        <xsl:value-of select="/PadChest/Rapports/Rapport[@id = $refRapport]"/>
+                                    </p>
+                                </details>
+                            </td>
+
                         </tr>
                     </xsl:for-each>
 

@@ -16,7 +16,7 @@ public class ValidationXSD {
 
             Validator validator = schema.newValidator();
 
-            validator.validate(new javax.xml.transform.stream.StreamSource(new File("extrait.xml")));
+            validator.validate(new javax.xml.transform.stream.StreamSource(new File("PadChest.xml")));
 
             System.out.println("Validation XSD réussie !");
 

@@ -1,14 +1,15 @@
+declare variable $labelRecherche external := "pneumonia";
+
 for $patient in db:get("PadChest")//Patient
 where $patient/Etude/Image[
     tokenize(
         translate(string(Labels), "[]'", ""),
         ","
-    ) ! normalize-space(.) = "pneumonia"
+    ) ! normalize-space(.) = $labelRecherche
 ]
-order by $patient/Naissance
+order by $patient/Naissance empty greatest
 return concat(
     $patient/@id,
     " : ",
-        format-number(number($patient/Naissance), "0")
-
+    if ($patient/Naissance) then string($patient/Naissance) else "naissance inconnue"
 )

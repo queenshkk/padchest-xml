@@ -1,0 +1,24 @@
+Lecture DOM terminée !
+Élément racine : PadChest
+Nombre total d'images : 160861
+Nombre de patients distincts : 67625
+Images avec loc right : 30123
+Images par projection :
+PA : 91728
+UNK : 8
+EXCLUDE : 11
+AP_horizontal : 14346
+L : 49579
+COSTAL : 630
+AP : 4559
+Top 10 des labels :
+normal : 50616
+COPD signs : 23280
+cardiomegaly : 15028
+unchanged : 14349
+aortic elongation : 10824
+pleural effusion : 10026
+scoliosis : 8335
+pneumonia : 8037
+interstitial pattern : 7831
+chronic changes : 7343

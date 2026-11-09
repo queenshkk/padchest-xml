@@ -23,7 +23,6 @@ public class ValidationDOM {
             DocumentBuilder builder = factory.newDocumentBuilder();
 
             builder.setErrorHandler(new DefaultHandler() {
-
                 @Override
                 public void error(SAXParseException e) throws SAXException {
                     throw e;
@@ -49,7 +48,6 @@ public class ValidationDOM {
             int imagesRight = 0;
 
             for (int i = 0; i < images.getLength(); i++) {
-
                 org.w3c.dom.Element image = (org.w3c.dom.Element) images.item(i);
 
                 String localisations = image

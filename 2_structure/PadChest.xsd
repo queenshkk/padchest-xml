@@ -5,14 +5,35 @@
     <xs:element name="PadChest">
         <xs:complexType>
             <xs:sequence>
+
+                <xs:element name="Rapports">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="Rapport"
+                                        minOccurs="1"
+                                        maxOccurs="unbounded">
+                                <xs:complexType>
+                                    <xs:simpleContent>
+                                        <xs:extension base="xs:string">
+                                            <xs:attribute name="id"
+                                                          type="xs:ID"
+                                                          use="required"/>
+                                        </xs:extension>
+                                    </xs:simpleContent>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+
                 <xs:element name="Patient"
                             minOccurs="1"
                             maxOccurs="unbounded">
 
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element name="Naissance" type="TypeNaissance"/>
-                            <xs:element name="Sexe" type="TypeSexe"/>
+                            <xs:element name="Naissance" type="TypeNaissance" minOccurs="0"/>
+                            <xs:element name="Sexe" type="TypeSexe" minOccurs="0"/>
                             <xs:element name="Etude"
                                         minOccurs="1"
                                         maxOccurs="unbounded">
@@ -25,12 +46,11 @@
 
                                             <xs:complexType>
                                                 <xs:sequence>
-                                                    <xs:element name="ImageDir" type="xs:string"/>
-                                                    <xs:element name="Projection" type="TypeProjection"/>                                                    <xs:element name="MethodProjection" type="xs:string"/>
-                                                    <xs:element name="Pediatric" type="xs:string"/>
-                                                    <xs:element name="ReportID" type="xs:string"/>
-                                                    <xs:element name="Report" type="xs:string"/>
-                                                    <xs:element name="MethodLabel" type="xs:string"/>
+                                                    <xs:element name="ImageDir" type="TypeImageDir"/>
+                                                    <xs:element name="Projection" type="TypeProjection"/>
+                                                    <xs:element name="MethodProjection" type="TypeMethodeProjection"/>
+                                                    <xs:element name="Pediatric" type="TypePediatric"/>
+                                                    <xs:element name="MethodLabel" type="TypeMethodeLabel"/>
                                                     <xs:element name="Labels" type="xs:string"/>
                                                     <xs:element name="Localizations" type="xs:string"/>
                                                     <xs:element name="LabelsLocalizationsBySentence" type="xs:string"/>
@@ -41,6 +61,9 @@
                                                 <xs:attribute name="id"
                                                               type="xs:ID"
                                                               use="required"/>
+                                                <xs:attribute name="rapportRef"
+                                                              type="xs:IDREF"
+                                                              use="required"/>
                                             </xs:complexType>
 
                                         </xs:element>
@@ -48,10 +71,6 @@
 
                                     <xs:attribute name="id"
                                                   type="xs:ID"
-                                                  use="required"/>
-
-                                    <xs:attribute name="patientRef"
-                                                  type="xs:IDREF"
                                                   use="required"/>
                                 </xs:complexType>
 
@@ -67,14 +86,14 @@
             </xs:sequence>
         </xs:complexType>
 
-        <xs:key name="ClePatient">
-            <xs:selector xpath="Patient"/>
+        <xs:key name="CleRapport">
+            <xs:selector xpath="Rapports/Rapport"/>
             <xs:field xpath="@id"/>
         </xs:key>
 
-        <xs:keyref name="ReferencePatient" refer="ClePatient">
-            <xs:selector xpath="Patient/Etude"/>
-            <xs:field xpath="@patientRef"/>
+        <xs:keyref name="ReferenceRapport" refer="CleRapport">
+            <xs:selector xpath="Patient/Etude/Image"/>
+            <xs:field xpath="@rapportRef"/>
         </xs:keyref>
     </xs:element>
 
@@ -86,13 +105,13 @@
             <xs:enumeration value="AP_horizontal"/>
             <xs:enumeration value="COSTAL"/>
             <xs:enumeration value="UNK"/>
+            <xs:enumeration value="EXCLUDE"/>
         </xs:restriction>
     </xs:simpleType>
 
     <xs:simpleType name="TypeNaissance">
         <xs:restriction base="xs:string">
-            <xs:pattern value="([0-9]{4}(\.0)?)?"/>
-        </xs:restriction>
+            <xs:pattern value="[0-9]{4}"/>        </xs:restriction>
     </xs:simpleType>
 
     <xs:simpleType name="TypeSexe">
@@ -100,8 +119,31 @@
             <xs:enumeration value="M"/>
             <xs:enumeration value="F"/>
             <xs:enumeration value="O"/>
-            <xs:enumeration value="nan"/>
-            <xs:enumeration value=""/>
         </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="TypePediatric">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="No"/>
+            <xs:enumeration value="PED"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="TypeMethodeProjection">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Manual review of DICOM fields"/>
+            <xs:enumeration value="resnet-50.t7"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="TypeMethodeLabel">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Physician"/>
+            <xs:enumeration value="RNN_model"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="TypeImageDir">
+        <xs:restriction base="xs:nonNegativeInteger"/>
     </xs:simpleType>
 </xs:schema>

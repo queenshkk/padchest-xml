@@ -34,6 +34,7 @@ public class MonHandler extends DefaultHandler {
         if (qName.equals("Image")) {
             nombreImages++;
         }
+
         texte = "";
 
         if (qName.equals("Patient")) {
@@ -80,7 +81,6 @@ public class MonHandler extends DefaultHandler {
         }
 
         if (qName.equals("Projection")) {
-
             String projection = texte.trim();
 
             if (compteurProjections.containsKey(projection)) {
@@ -99,9 +99,7 @@ public class MonHandler extends DefaultHandler {
 
         for (int i = 0; i < labels.size(); i++) {
             for (int j = i + 1; j < labels.size(); j++) {
-
-                if (compteurLabels.get(labels.get(j)) >
-                        compteurLabels.get(labels.get(i))) {
+                if (compteurLabels.get(labels.get(j)) > compteurLabels.get(labels.get(i))) {
 
                     String temp = labels.get(i);
                     labels.set(i, labels.get(j));
@@ -109,8 +107,8 @@ public class MonHandler extends DefaultHandler {
                 }
             }
         }
-        System.out.println("Top 10 des labels :");
 
+        System.out.println("Top 10 des labels :");
         for (int i = 0; i < 10 && i < labels.size(); i++) {
             String label = labels.get(i);
             System.out.println(label + " : " + compteurLabels.get(label));

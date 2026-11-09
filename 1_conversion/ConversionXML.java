@@ -5,12 +5,11 @@ import hepl.xml.laboxml.model.Etude;
 import hepl.xml.laboxml.model.Image;
 import hepl.xml.laboxml.model.Patient;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class ConversionXML {
     public static void main(String[] args) {
@@ -20,16 +19,16 @@ public class ConversionXML {
         ArrayList<Patient> patients = new ArrayList<Patient>();
         HashMap<String, Patient> patientsParId = new HashMap<>();
         HashMap<String, Etude> etudesParId = new HashMap<>();
+        LinkedHashMap<String, String> rapportsParId = new LinkedHashMap<>();
 
         try {
-            BufferedReader br = new BufferedReader(new FileReader(fichierCSV));
-
-            // Ignorer l'entête
+            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fichierCSV), StandardCharsets.UTF_8));
             br.readLine();
 
             System.out.println("Début de la lecture du CSV");
             String ligne;
             int compteur = 0;
+            int imagesAjoutees = 0;
 
             while ((ligne = LectureCSV.lireEnregistrement(br)) != null) {
                 compteur++;
@@ -42,8 +41,7 @@ public class ConversionXML {
                 String studyID = champs[4];
 
                 String patientID = champs[5];
-                String naissance = champs[6];
-                String sexe = champs[7];
+                String naissance = normaliserNaissance(champs[6]);                String sexe = champs[7];
 
                 String projection = champs[9];
                 String methodProjection = champs[10];
@@ -58,9 +56,12 @@ public class ConversionXML {
                 String labelCUIS = champs[34];
                 String localizationsCUIS = champs[35];
 
-                // Si la ligne n'a pas de PatientID, on passe à la suivante
-                if (patientID == null || patientID.isEmpty()) {
+                if (patientID == null || patientID.isEmpty() || studyID == null || studyID.isEmpty()) {
                     continue;
+                }
+
+                if (!rapportsParId.containsKey(reportID)) {
+                    rapportsParId.put(reportID, report);
                 }
 
                 Patient patient = patientsParId.get(patientID);
@@ -70,10 +71,6 @@ public class ConversionXML {
 
                     patients.add(patient);
                     patientsParId.put(patientID, patient);
-                }
-
-                if (studyID == null || studyID.isEmpty()) {
-                    continue;
                 }
 
                 String cleEtude = patientID + "_" + studyID;
@@ -87,7 +84,6 @@ public class ConversionXML {
                     etudesParId.put(cleEtude, etude);
                 }
 
-                // Créer l'image
                 Image image = new Image(
                         imageID,
                         imageDir,
@@ -104,44 +100,58 @@ public class ConversionXML {
                         localizationsCUIS
                 );
                 etude.ajouterImage(image);
+                imagesAjoutees++;
             }
 
 
         br.close();
 
-        // Création du fichier XML
-        BufferedWriter bw = new BufferedWriter(new FileWriter(fichierXML));
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fichierXML), StandardCharsets.UTF_8));
 
         bw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         bw.newLine();
 
-        bw.write("<!DOCTYPE PadChest SYSTEM \"PadChest.dtd\">");
+        bw.write("<!DOCTYPE PadChest SYSTEM \"2_structure/PadChest.dtd\">");
         bw.newLine();
 
         bw.write("<PadChest>");
         bw.newLine();
 
-        // Parcourir les patients
+        bw.write("  <Rapports>");
+        bw.newLine();
+
+        for (String reportID : rapportsParId.keySet()) {
+            bw.write("    <Rapport id=\"R" + echapperXML(reportID) + "\">");
+            bw.write(echapperXML(rapportsParId.get(reportID)));
+            bw.write("</Rapport>");
+            bw.newLine();
+        }
+
+        bw.write("  </Rapports>");
+        bw.newLine();
+
         for (Patient patient : patients) {
             bw.write("  <Patient id=\"P" + echapperXML(patient.getId()) + "\">");
             bw.newLine();
 
-            bw.write("    <Naissance>" + echapperXML(patient.getNaissance()) + "</Naissance>");
-            bw.newLine();
+            if (!estManquant(patient.getNaissance())) {
+                bw.write("    <Naissance>" + echapperXML(patient.getNaissance()) + "</Naissance>");
+                bw.newLine();
+            }
 
-            bw.write("    <Sexe>" + echapperXML(patient.getSexe()) + "</Sexe>");
-            bw.newLine();
+            if (!estManquant(patient.getSexe())) {
+                bw.write("    <Sexe>" + echapperXML(patient.getSexe()) + "</Sexe>");
+                bw.newLine();
+            }
 
-            // Parcourir les études
             for (Etude etude : patient.getEtudes()) {
                 bw.write("    <Etude id=\"E" + echapperXML(etude.getPatientRef())
-                        + "_" + echapperXML(etude.getId())
-                        + "\" patientRef=\"P" + echapperXML(etude.getPatientRef()) + "\">");
+                        + "_" + echapperXML(etude.getId()) + "\">");
                 bw.newLine();
 
-                // Parcourir les images
                 for (Image image : etude.getImages()) {
-                    bw.write("      <Image id=\"I" + echapperXML(image.getId()) + "\">");
+                    bw.write("      <Image id=\"I" + echapperXML(image.getId())
+                            + "\" rapportRef=\"R" + echapperXML(image.getReportID()) + "\">");
                     bw.newLine();
 
                     bw.write("        <ImageDir>" + echapperXML(image.getImageDir()) + "</ImageDir>");
@@ -154,12 +164,6 @@ public class ConversionXML {
                     bw.newLine();
 
                     bw.write("        <Pediatric>" + echapperXML(image.getPediatric()) + "</Pediatric>");
-                    bw.newLine();
-
-                    bw.write("        <ReportID>" + echapperXML(image.getReportID()) + "</ReportID>");
-                    bw.newLine();
-
-                    bw.write("        <Report>" + echapperXML(image.getReport()) + "</Report>");
                     bw.newLine();
 
                     bw.write("        <MethodLabel>" + echapperXML(image.getMethodLabel()) + "</MethodLabel>");
@@ -197,6 +201,7 @@ public class ConversionXML {
             bw.close();
 
             System.out.println("Enregistrements CSV lus : " + compteur);
+            System.out.println("Images ajoutées : " + imagesAjoutees);
             System.out.println("Conversion terminée.");
         } catch (Exception e) {
             System.out.println("Erreur : " + e.getMessage());
@@ -217,5 +222,14 @@ public class ConversionXML {
         return texte;
     }
 
+    public static String normaliserNaissance(String naissance) {
+        if (naissance.matches("\\d{4}\\.0")) {
+            return naissance.substring(0, 4);
+        }
+        return naissance;
+    }
 
+    public static boolean estManquant(String valeur) {
+        return valeur == null || valeur.trim().isEmpty() || valeur.trim().equals("nan");
+    }
 }

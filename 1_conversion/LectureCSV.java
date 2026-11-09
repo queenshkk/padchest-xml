@@ -26,7 +26,7 @@ public class LectureCSV {
                 return null;
             }
 
-            ligne = ligne + " " + ligneSuivante;
+            ligne = ligne + "\n" + ligneSuivante;
 
             for (int i = 0; i < ligneSuivante.length(); i++) {
                 if (ligneSuivante.charAt(i) == '"') {
@@ -41,7 +41,7 @@ public class LectureCSV {
     public static String[] decouperLigne(String ligne) {
         String[] champs = new String[36];
 
-        String valeur = "";
+        StringBuilder valeur = new StringBuilder();
         int colonne = 0;
         boolean guillemets = false;
 
@@ -49,24 +49,36 @@ public class LectureCSV {
             char caractere = ligne.charAt(i);
 
             if (caractere == '"') {
-                guillemets = !guillemets;
+                if (guillemets && i + 1 < ligne.length() && ligne.charAt(i + 1) == '"') {
+                    valeur.append('"');
+                    i++;
+                } else {
+                    guillemets = !guillemets;
+                }
             }
             else if (caractere == ',' && !guillemets) {
-                champs[colonne] = valeur;
+                if (colonne >= 35) {
+                    throw new IllegalArgumentException("Trop de colonnes CSV");
+                }
+
+                champs[colonne] = valeur.toString();
                 colonne++;
-                valeur = "";
+                valeur.setLength(0);
             }
             else {
-                valeur = valeur + caractere;
+                valeur.append(caractere);
             }
+        }
+
+        if (guillemets) {
+            throw new IllegalArgumentException("Guillemets CSV non fermés");
         }
 
         if (colonne != 35) {
-            throw new IllegalArgumentException("Nombre de colonnes incorrect : " + (colonne + 1)
-            );
+            throw new IllegalArgumentException("Nombre de colonnes incorrect : " + (colonne + 1));
         }
 
-        champs[colonne] = valeur;
+        champs[colonne] = valeur.toString();
 
         return champs;
     }

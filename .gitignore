@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+PadChest.xml
+PADCHEST_chest_x_ray_images_labels_160K_01.02.19.csv
