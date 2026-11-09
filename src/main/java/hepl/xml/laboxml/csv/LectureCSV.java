@@ -1,6 +1,7 @@
 package hepl.xml.laboxml.csv;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 
 public class LectureCSV {
     public static String lireEnregistrement(BufferedReader br) throws Exception {
@@ -22,8 +23,7 @@ public class LectureCSV {
             String ligneSuivante = br.readLine();
 
             if (ligneSuivante == null) {
-                System.out.println("Attention : dernier enregistrement CSV incomplet, ignoré.");
-                return null;
+                throw new IOException("Enregistrement CSV incomplet à la fin du fichier : guillemets non fermés.");
             }
 
             ligne = ligne + "\n" + ligneSuivante;

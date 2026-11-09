@@ -76,7 +76,7 @@ Nous avons aussi exécuté les programmes directement dans IntelliJ IDEA, dans c
 - Patients distincts : 67 625
 - Images contenant `loc right` : 30 123
 
-Les résultats des programmes sont dans 3_parsing/resultats_sax.txt et 3_parsing/resultats_dom.txt.
+Les résultats des programmes sont dans 3_parsing/Resultats_SAX.txt et 3_parsing/Resultats_DOM.txt.
 
 **Images par projection :**
 

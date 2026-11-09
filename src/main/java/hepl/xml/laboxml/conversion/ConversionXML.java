@@ -204,7 +204,7 @@ public class ConversionXML {
             System.out.println("Images ajoutées : " + imagesAjoutees);
             System.out.println("Conversion terminée.");
         } catch (Exception e) {
-            System.out.println("Erreur : " + e.getMessage());
+            System.err.println("Conversion CSV vers XML échouée : " + e.getMessage());
         }
 
     }
